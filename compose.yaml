@@ -1,0 +1,157 @@
+
+services:
+
+  postgres:
+
+    image: docker.io/library/postgres:16-alpine
+
+    env_file: .env
+
+    environment:
+
+      POSTGRES_DB: ${POSTGRES_DB}
+
+      POSTGRES_USER: ${POSTGRES_USER}
+
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+
+      - pgdata:/var/lib/postgresql/data
+
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+
+    healthcheck:
+
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+
+      interval: 5s
+
+      timeout: 3s
+
+      retries: 10
+
+    restart: unless-stopped
+
+
+
+  redis:
+
+    image: docker.io/library/redis:alpine
+
+    command: ["redis-server", "--appendonly", "yes"]
+
+    healthcheck:
+
+      test: ["CMD", "redis-cli", "ping"]
+
+      interval: 5s
+
+      timeout: 3s
+
+      retries: 10
+
+    restart: unless-stopped
+
+
+
+  api:
+
+    build:
+
+      context: ./api
+
+      target: dev
+
+    env_file: .env
+
+    environment:
+
+      API_PORT: ${API_PORT}
+
+    ports:
+
+      - "${API_PORT}:8080"
+
+    volumes:
+
+      - ./api/src:/app/src
+
+    depends_on:
+
+      postgres:
+
+        condition: service_healthy
+
+      redis:
+
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
+
+  worker:
+
+    build:
+
+      context: ./worker
+
+      target: dev
+
+    env_file: .env
+
+    volumes:
+
+      - ./worker/src:/app/src
+
+    depends_on:
+
+      postgres:
+
+        condition: service_healthy
+
+      redis:
+
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
+
+  frontend:
+
+    build:
+
+      context: ./frontend
+
+      target: dev
+
+    env_file: .env
+
+    environment:
+
+      FRONTEND_PORT: ${FRONTEND_PORT}
+
+      API_BASE_URL: ${API_BASE_URL}
+
+    ports:
+
+      - "${FRONTEND_PORT}:3000"
+
+    volumes:
+
+      - ./frontend/src:/app/src
+
+    depends_on:
+
+      - api
+
+    restart: unless-stopped
+
+
+
+volumes:
+
+  pgdata:
+
