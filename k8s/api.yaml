@@ -42,11 +42,29 @@ spec:
 
       serviceAccountName: api-sa
 
+      automountServiceAccountToken: false
+
+      securityContext:
+
+        runAsNonRoot: true
+
+        seccompProfile:
+
+          type: RuntimeDefault
+
       containers:
 
         - name: api
 
           image: image-registry.openshift-image-registry.svc:5000/devops-ticketing/api:latest
+
+          securityContext:
+
+            allowPrivilegeEscalation: false
+
+            capabilities:
+
+              drop: ["ALL"]
 
           ports:
 

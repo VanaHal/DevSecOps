@@ -42,11 +42,29 @@ spec:
 
       serviceAccountName: worker-sa
 
+      automountServiceAccountToken: false
+
+      securityContext:
+
+        runAsNonRoot: true
+
+        seccompProfile:
+
+          type: RuntimeDefault
+
       containers:
 
         - name: worker
 
           image: image-registry.openshift-image-registry.svc:5000/devops-ticketing/worker:latest
+
+          securityContext:
+
+            allowPrivilegeEscalation: false
+
+            capabilities:
+
+              drop: ["ALL"]
 
           envFrom:
 
@@ -99,3 +117,23 @@ spec:
               cpu: 500m
 
               memory: 512Mi
+
+          readinessProbe:
+
+            exec:
+
+              command: ["pgrep", "-f", "node"]
+
+            initialDelaySeconds: 5
+
+            periodSeconds: 15
+
+          livenessProbe:
+
+            exec:
+
+              command: ["pgrep", "-f", "node"]
+
+            initialDelaySeconds: 10
+
+            periodSeconds: 20

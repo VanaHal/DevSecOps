@@ -30,11 +30,31 @@ spec:
 
     spec:
 
+      serviceAccountName: redis-sa
+
+      automountServiceAccountToken: false
+
+      securityContext:
+
+        runAsNonRoot: true
+
+        seccompProfile:
+
+          type: RuntimeDefault
+
       containers:
 
         - name: redis
 
           image: docker.io/library/redis:alpine
+
+          securityContext:
+
+            allowPrivilegeEscalation: false
+
+            capabilities:
+
+              drop: ["ALL"]
 
           args: ["--save", "", "--appendonly", "no"]
 

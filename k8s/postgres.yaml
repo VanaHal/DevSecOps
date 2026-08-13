@@ -56,11 +56,31 @@ spec:
 
     spec:
 
+      serviceAccountName: postgres-sa
+
+      automountServiceAccountToken: false
+
+      securityContext:
+
+        runAsNonRoot: true
+
+        seccompProfile:
+
+          type: RuntimeDefault
+
       containers:
 
         - name: postgres
 
           image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:12-el8
+
+          securityContext:
+
+            allowPrivilegeEscalation: false
+
+            capabilities:
+
+              drop: ["ALL"]
 
           ports:
 

@@ -42,11 +42,29 @@ spec:
 
       serviceAccountName: frontend-sa
 
+      automountServiceAccountToken: false
+
+      securityContext:
+
+        runAsNonRoot: true
+
+        seccompProfile:
+
+          type: RuntimeDefault
+
       containers:
 
         - name: frontend
 
           image: image-registry.openshift-image-registry.svc:5000/devops-ticketing/frontend:latest
+
+          securityContext:
+
+            allowPrivilegeEscalation: false
+
+            capabilities:
+
+              drop: ["ALL"]
 
           ports:
 
@@ -62,7 +80,7 @@ spec:
 
             - name: API_BASE_URL
 
-              value: "http://api:8080"
+              value: "https://api-devops-ticketing.apps.ocp4.example.com"
 
           resources:
 
