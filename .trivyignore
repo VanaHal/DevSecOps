@@ -1,0 +1,11 @@
+
+# CVE iznimke za ovaj projekt
+
+# Format: CVE-YYYY-NNNNN  # obrazloženje
+
+#
+
+# Trenutno nema prihvaćenih iznimki - svi CRITICAL/HIGH nalazi
+
+# moraju biti popravljeni ili ce build past.
+
