@@ -19,7 +19,7 @@ services:
 
       - pgdata:/var/lib/postgresql/data
 
-      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro,Z
 
     healthcheck:
 
@@ -75,7 +75,7 @@ services:
 
     volumes:
 
-      - ./api/src:/app/src
+      - ./api/src:/app/src:Z
 
     depends_on:
 
@@ -103,7 +103,7 @@ services:
 
     volumes:
 
-      - ./worker/src:/app/src
+      - ./worker/src:/app/src:Z
 
     depends_on:
 
@@ -141,7 +141,7 @@ services:
 
     volumes:
 
-      - ./frontend/src:/app/src
+      - ./frontend/src:/app/src:Z
 
     depends_on:
 
