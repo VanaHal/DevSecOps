@@ -1,0 +1,155 @@
+apiVersion: v1
+
+kind: ServiceAccount
+
+metadata:
+
+  name: frontend-sa
+
+---
+
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: frontend
+
+  labels:
+
+    app: frontend
+
+spec:
+
+  replicas: 1
+
+  selector:
+
+    matchLabels:
+
+      app: frontend
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: frontend
+
+    spec:
+
+      serviceAccountName: frontend-sa
+
+      containers:
+
+        - name: frontend
+
+          image: image-registry.openshift-image-registry.svc:5000/devops-ticketing/frontend:latest
+
+          ports:
+
+            - containerPort: 3000
+
+          envFrom:
+
+            - configMapRef:
+
+                name: app-config
+
+          env:
+
+            - name: API_BASE_URL
+
+              value: "http://api:8080"
+
+          resources:
+
+            requests:
+
+              cpu: 100m
+
+              memory: 128Mi
+
+            limits:
+
+              cpu: 300m
+
+              memory: 256Mi
+
+          readinessProbe:
+
+            tcpSocket:
+
+              port: 3000
+
+            initialDelaySeconds: 10
+
+            periodSeconds: 10
+
+          livenessProbe:
+
+            tcpSocket:
+
+              port: 3000
+
+            initialDelaySeconds: 20
+
+            periodSeconds: 20
+
+---
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: frontend
+
+  labels:
+
+    app: frontend
+
+spec:
+
+  selector:
+
+    app: frontend
+
+  ports:
+
+    - port: 3000
+
+      targetPort: 3000
+
+  type: ClusterIP
+
+---
+
+apiVersion: route.openshift.io/v1
+
+kind: Route
+
+metadata:
+
+  name: frontend
+
+spec:
+
+  to:
+
+    kind: Service
+
+    name: frontend
+
+  port:
+
+    targetPort: 3000
+
+  tls:
+
+    termination: edge
+
+    insecureEdgeTerminationPolicy: Redirect
