@@ -198,13 +198,11 @@ oc new-project devops-ticketing   # ili oc project devops-ticketing ako već pos
 
 
 
-> Napomena: `KUBECONFIG` varijablu potrebno trajno dodati u `~/.bashrc` kako ju ne bi bilo potrebno ručno postavljati u svakoj novoj terminal sesiji:
+> Napomena: `KUBECONFIG` varijablu potrebno je trajno dodati u `~/.bashrc` kako ju ne bi bilo potrebno ručno postavljati u svakoj novoj terminal sesiji.
 
-> ```bash
-
-> echo 'export KUBECONFIG=~/.auth/ocp4-kubeconfig' >> ~/.bashrc
-
-> ```
+```bash
+echo 'export KUBECONFIG=~/.auth/ocp4-kubeconfig' >> ~/.bashrc
+```
 
 
 
