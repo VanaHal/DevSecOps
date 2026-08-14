@@ -99,7 +99,9 @@ jobs:
 
 
 
-      - name: Trivy scan (quality gate)
+      - name: Generate SARIF report (always succeeds, for Security tab)
+
+        continue-on-error: true
 
         uses: aquasecurity/trivy-action@v0.36.0
 
@@ -111,11 +113,7 @@ jobs:
 
           output: trivy-${{ matrix.service }}.sarif
 
-          severity: CRITICAL,HIGH
-
-          exit-code: '1'
-
-          ignore-unfixed: true
+          exit-code: '0'
 
 
 
@@ -146,6 +144,24 @@ jobs:
         with:
 
           sarif_file: trivy-${{ matrix.service }}.sarif
+
+
+
+      - name: Trivy scan (quality gate)
+
+        uses: aquasecurity/trivy-action@v0.36.0
+
+        with:
+
+          image-ref: ghcr.io/${{ env.OWNER_LC }}/devops-project-app-${{ matrix.service }}:latest
+
+          format: json
+
+          severity: CRITICAL,HIGH
+
+          exit-code: '1'
+
+          ignore-unfixed: true
 
 
 
