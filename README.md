@@ -41,7 +41,7 @@ DevSecOps projekt: mikroservisna aplikacija za prodaju ulaznica, s kompletnim ci
 
                             ┌─────▼─────┐
 
-                            │  worker   │  (Node.js, konzumira red)
+                            │  worker   │  (Node.js, preuzima poruke)
 
                             └───────────┘
 
@@ -53,7 +53,7 @@ DevSecOps projekt: mikroservisna aplikacija za prodaju ulaznica, s kompletnim ci
 
 - **api** — prima narudžbe, upisuje ih u Redis red (`ticket_orders`), odmah vraća odgovor korisniku
 
-- **worker** — konzumira Redis red, upisuje potvrđene narudžbe u PostgreSQL
+- **worker** — preuzima poruke iz Redis reda, upisuje potvrđene narudžbe u PostgreSQL
 
 - **postgres** — perzistentna pohrana narudžbi
 
@@ -92,18 +92,17 @@ cp .env.example .env
 # uredi .env po potrebi (lozinke, portovi)
 
 
-
 podman-compose up -d
 
 ```
 
 
 
-Ovo pokreće sve servise (`postgres`, `redis`, `api`, `worker`, `frontend`) u `dev` modu, s hot-reload-om preko `nodemon` i mount-anim `src` folderima — izmjene u kodu se odmah reflektiraju bez ponovnog builda slike.
+Ova naredba pokreće sve servise (postgres, redis, api, worker, frontend) u dev modu, s hot-reload-om preko nodemon i mount-anim src folderima — izmjene u kodu odmah se reflektiraju bez ponovnog builda slike.
 
 
 
-## Provjera da sve radi
+## Provjera funkcionalnosti
 
 
 
@@ -115,11 +114,11 @@ curl http://localhost:8080/healthz
 
 
 
-Očekivan odgovor: `{"status":"ready"}`
+Očekivani odgovor: `{"status":"ready"}`
 
 
 
-Zatim otvori `http://localhost:3000` u pregledniku, napravi test kupnju, i provjeri worker log:
+Pristupiti `http://localhost:3000` u pregledniku, napraviti testnu kupnju, i provjeriti worker log:
 
 
 
@@ -131,7 +130,7 @@ podman-compose logs worker --tail=20
 
 
 
-Trebala bi vidjeti `Order processed`.
+Trebalo bi se vidjeti zapis `Order processed`.
 
 
 
@@ -199,7 +198,7 @@ oc new-project devops-ticketing   # ili oc project devops-ticketing ako već pos
 
 
 
-> Napomena: `KUBECONFIG` varijablu vrijedi trajno dodati u `~/.bashrc` da je ne trebate ručno postavljati u svakoj novoj terminal sesiji:
+> Napomena: `KUBECONFIG` varijablu potrebno trajno dodati u `~/.bashrc` kako ju ne bi bilo potrebno ručno postavljati u svakoj novoj terminal sesiji:
 
 > ```bash
 
@@ -265,7 +264,7 @@ oc get route frontend
 
 
 
-Otvori URL iz `oc get route frontend` u pregledniku i testiraj kupnju karte.
+Pristupiti URL-u iz `oc get route frontend` u pregledniku i testirati kupnju karte.
 
 
 
@@ -300,7 +299,6 @@ oc set image deployment/api api=<novi-image-tag>
 oc rollout status deployment/api
 
 
-
 # u slučaju problema:
 
 oc rollout undo deployment/api
@@ -327,7 +325,7 @@ GitHub Actions workflow (`.github/workflows/ci.yml`) se pokreće na svaki push/P
 
 3. **Trivy sken (quality gate)** — ako postoji CRITICAL/HIGH ranjivost s dostupnim fixom, pipeline staje i push se ne izvršava
 
-4. **SARIF izvještaj** — uploadan kao artifact (30 dana čuvanja) i pokušava se poslati u GitHub Security tab (zahtijeva GitHub Advanced Security, nedostupno za privatne repozitorije bez plaćene licence)
+4. **SARIF izvještaj** — uploadan kao artifact (30 dana čuvanja), pokušava se poslati u GitHub Security tab (zahtijeva GitHub Advanced Security — nedostupno za privatne repozitorije bez plaćene licence)
 
 5. **Push na GHCR** — samo ako je gate prošao i radi se o push-u na `main`
 
@@ -359,7 +357,7 @@ CVE iznimke (ako ih ima) dokumentirane su u `.trivyignore`.
 
 | `docs/security/image-scan-report.md` | Detaljan Trivy sken svih slika (prije prve K8s implementacije) |
 
-| `docs/runbook.md` | Tri obavezna, stvarno testirana scenarija (pad baze, loš image tag, neispravan secret), format Simptom → Dijagnoza → Popravak → Validacija |
+| `docs/runbook.md` | Tri testirana scenarija (pad baze, loš image tag, neispravan secret), format Simptom → Dijagnoza → Popravak → Validacija |
 
 
 
@@ -377,9 +375,9 @@ CVE iznimke (ako ih ima) dokumentirane su u `.trivyignore`.
 
 ├── api/                    # API servis (Node.js/Express)
 
-├── worker/                 # Worker servis (konzumira Redis red)
+├── worker/                 # Worker servis (preuzima poruke iz Redis reda)
 
-├── frontend/                # Frontend servis
+├── frontend/               # Frontend servis
 
 ├── infra/postgres/init.sql # Shema baze
 
@@ -387,8 +385,11 @@ CVE iznimke (ako ih ima) dokumentirane su u `.trivyignore`.
 
 ├── docs/
 
+│   ├── architecture.md
+│   ├── image-policy.md
+│   ├── devsecops.md
+│   ├── delivery-metrics.md
 │   ├── security/image-scan-report.md
-
 │   └── runbook.md
 
 ├── .github/workflows/ci.yml
