@@ -341,23 +341,25 @@ CVE iznimke (ako ih ima) dokumentirane su u `.trivyignore`.
 
 
 
-# Sigurnosno izvješće
+# Dokumentacija
 
 
 
-Detaljan Trivy sken svih slika (prije prve K8s implementacije) nalazi se u `docs/security/image-scan-report.md`.
+| Dokument | Sadržaj |
 
+|---|---|
 
+| `docs/architecture.md` | Arhitekturni dijagram i kritička usporedba kontejnera i virtualnih mašina za ovu aplikaciju |
 
----
+| `docs/image-policy.md` | Politika upravljanja slikama — tagging strategija, sadržaj production slike, uvjeti objave |
 
+| `docs/devsecops.md` | DevSecOps metodologija — obrazloženje odabranih alata i sigurnosnih kontrola u pipelineu |
 
+| `docs/delivery-metrics.md` | Mjerenje brzine isporuke — ručni proces vs. automatizirani CI/CD |
 
-# Runbook za incidente
+| `docs/security/image-scan-report.md` | Detaljan Trivy sken svih slika (prije prve K8s implementacije) |
 
-
-
-Tri obavezna, stvarno testirana scenarija (pad baze, loš image tag, neispravan secret) dokumentirana su u `docs/runbook.md`, svaki s formatom Simptom → Dijagnoza → Popravak → Validacija.
+| `docs/runbook.md` | Tri obavezna, stvarno testirana scenarija (pad baze, loš image tag, neispravan secret), format Simptom → Dijagnoza → Popravak → Validacija |
 
 
 
